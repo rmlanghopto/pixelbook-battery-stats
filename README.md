@@ -1,8 +1,11 @@
 # pixelbook-battery-stats
 Battery firmware scraper script for Pixelbooks with a faulty EC battery connection
 
-HOW TO USE:
-Open crosh via CTRL + ALT + T, enter shell mode (type and enter <code>shell</code> from the crosh terminal), copy the script to /usr/local/bin, and run it by typing its name via the crosh shell. The script provides values for current % charged, current battery health, and battery cycles.
+<b>HOW TO USE:</b>
+<p>Open crosh via CTRL + ALT + T, enter shell mode (type and enter <code>shell</code> from the crosh terminal), copy the script to /usr/local/bin, and run it by typing its name via the crosh shell. The script provides values for current % charged, current battery health, and battery cycles.</p>
+
+
+<b>BACKGROUND/WHAT'S NEXT</b>
 
 <p>This script came about when I changed a Pixelbook battery and likely shorted out the embedded controller (EC) connection while doing so; my understanding is that this is a common risk and issue when replacing batteries on these models.
 While the battery seems completely unrecognized by any GUI elements (like a shelf notification) or common ChromeOS shell (crosh) commands like battery_test, battery stats can still be retrieved by at least one commands via crosh. You can do this by logging into crosh by using CTL + ALT + T, typing shell (provided you're in developer mode, which you must be if you've disabled write-protection), and then typing <code>sudo ectool battery</code> into the terminal. The values returned include OEM name, model number, chemistry(!), serial number, design capacity, last full charge, design output voltage, cycle count, present voltage, present current, remaining capacity, and flags.
