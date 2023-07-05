@@ -1,12 +1,69 @@
-#! /bin/bash
+#!/bin/sh
+# Copyright 2017 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
 
 battery_full=$(sudo ectool battery 2>/dev/null | awk 'NR == 7 {print $4}')
 battery_left=$(sudo ectool battery 2>/dev/null | awk 'NR == 12 {print $3}')
-battery_cycles=$(sudo ectool battery 2>/dev/null | awk 'NR == 9 {print $3}')
-battery_new=$(sudo ectool battery 2>/dev/null | awk 'NR == 6 {print $3}')
-battery_health=$(echo "scale=4; ($battery_left / $battery_new) * 100" | bc)
 battery_now=$(echo "scale=4; ($battery_left / $battery_full) * 100" | bc)
+battery_percent=$(echo ${battery_now} | xargs printf "%.0f%% charged \n")
 
-echo $battery_now | xargs printf "%.0f%% charged \n"
-echo $battery_health | xargs printf "%.0f%% healthy \n"
-echo $battery_cycles | xargs printf "%d battery cycles \n"
+# Write an error message and exit.
+# Usage: <message>
+die() {
+  echo "ERROR: $*"
+  exit 1
+}
+# Send a DCS sequence through tmux.
+# Usage: <sequence>
+tmux_dcs() {
+  printf '\033Ptmux;\033%s\033\\' "$1"
+}
+# Send a DCS sequence through screen.
+# Usage: <sequence>
+screen_dcs() {
+  # Screen limits the length of string sequences, so we have to break it up.
+  # Going by the screen history:
+  #   (v4.2.1) Apr 2014 - today: 768 bytes
+  #   Aug 2008 - Apr 2014 (v4.2.0): 512 bytes
+  #   ??? - Aug 2008 (v4.0.3): 256 bytes
+  # Since v4.2.0 is only ~4 years old, we'll use the 256 limit.
+  # We can probably switch to the 768 limit in 2022.
+  local limit=768
+  # We go 4 bytes under the limit because we're going to insert two bytes
+  # before (\eP) and 2 bytes after (\e\) each string.
+  echo "$1" | \
+    sed -E "s:.{$(( limit - 4 ))}:&\n:g" | \
+    sed -E -e 's:^:\x1bP:' -e 's:$:\x1b\\:' | \
+    tr -d '\n'
+}
+# Send an escape sequence to hterm.
+# Usage: <sequence>
+print_seq() {
+  local seq="$1"
+  case ${TERM-} in
+  screen*)
+    # Since tmux defaults to setting TERM=screen (ugh), we need to detect
+    # it here specially.
+    if [ -n "${TMUX-}" ]; then
+      tmux_dcs "${seq}"
+    else
+      screen_dcs "${seq}"
+    fi
+    ;;
+  tmux*)
+    tmux_dcs "${seq}"
+    ;;
+  *)
+    printf '%s' "${seq}"
+    ;;
+  esac
+}
+# Send a notification.
+# Usage: [title] [body]
+notify() {
+  local title="${1-}" body="${2-}"
+  print_seq "$(printf '\033]777;notify;%s;%s\a' "${title}" "${body}")"
+}
+
+notify "$battery_percent"
