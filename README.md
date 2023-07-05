@@ -15,5 +15,6 @@ Battery firmware scraper and notifier script for Pixelbooks with a faulty EC bat
 <b>WHAT'S NEXT:</b>
 <p></p>
 <li>Consolidate code into a single script?</li>
+<li>Remove unnecessary code from the original <a href=https://chromium.googlesource.com/apps/libapps/+/HEAD/hterm/etc/hterm-notify.sh>hterm-notify.sh</a> script</li>
 <li>Run the script without needing a persistently open crosh window</li>
 <li>Customize the notification with a graphic depicting battery charge level?</li>
