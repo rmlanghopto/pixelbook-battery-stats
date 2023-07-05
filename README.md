@@ -2,7 +2,7 @@
 Battery firmware scraper and notifier script for Pixelbooks with a faulty EC battery connection
 
 <b>HOW TO USE:</b>
-<p>Open crosh via CTRL + ALT + T, enter shell mode (type and enter <code>shell</code> from the crosh terminal), copy the scripts to /usr/local/bin, and run it by typing its name via the crosh shell. Optionally, add the script to <code>~/.bashrc</code>. The script provides notifications for battery's current % charged.</p>
+<p>Open crosh via CTRL + ALT + T, enter shell mode (type and enter <code>shell</code> from the crosh terminal), copy the scripts to /usr/local/bin, and add the <code>battery_loop.sh</code> script to <code>~/.bashrc</code>. The script provides notifications for battery's current % charged.</p>
 
 
 <b>BACKGROUND:</b>
